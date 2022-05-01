@@ -7,7 +7,6 @@ Date: 2021-02-13 11:18:26
 '''
 import socket
 import struct
-import sys
 import time
 
 NTP_SERVER = "0.uk.pool.ntp.org"
