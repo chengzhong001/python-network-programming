@@ -5,9 +5,9 @@ Description: 优雅地处理套接字错误
 Author: zhengchengzhong
 Date: 2021-02-13 10:28:14
 '''
-import sys
-import socket
 import argparse
+import socket
+import sys
 
 
 def main():

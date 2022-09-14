@@ -7,6 +7,7 @@ Date: 2021-02-13 10:11:54
 '''
 import socket
 
+
 def find_service_name():
     protocolname = "tcp"
     for port in [80, 25, 443]:

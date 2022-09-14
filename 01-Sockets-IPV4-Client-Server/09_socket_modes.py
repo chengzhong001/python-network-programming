@@ -7,6 +7,7 @@ Date: 2021-02-13 10:41:11
 '''
 import socket
 
+
 def test_socket_modes():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.setblocking(True) # Blocking mode

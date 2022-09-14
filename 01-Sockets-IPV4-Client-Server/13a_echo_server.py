@@ -3,7 +3,6 @@
 import argparse
 import socket
 
-
 host = "localhost"
 data_playload = 2048
 backlog = 5
