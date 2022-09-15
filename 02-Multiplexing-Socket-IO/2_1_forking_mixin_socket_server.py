@@ -47,7 +47,8 @@ def main():
     server = ForkingServer((SERVER_HOST, SERVER_PORT), ForkingServerRequestHandler)
     ip, port = server.server_address
     server_thread = threading.Thread(target=server.serve_forever)
-    server_thread.setDaemon(True)  # don't hang on exit
+    # server_thread.setDaemon(True)  # don't hang on exit
+    server_thread.daemon = True
     server_thread.start()
     print(f"Server loop running PID: {os.getpid()}")
     # Launch the client(s)
