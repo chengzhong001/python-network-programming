@@ -7,7 +7,6 @@ import struct
 import sys
 
 SERVER_HOST = "localhost"
-
 CHAT_SERVER_NAME = "server"
 
 
@@ -39,8 +38,9 @@ class ChatServer:
         self.outputs = []
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.server.bind(SERVER_HOST, port)
-        print("Server listen to port: {port}")
+        self.server.bind((SERVER_HOST, port))
+        print(f"Server listen to port: {port}")
+        self.server.listen(backlog)
         signal.signal(signal.SIGINT, self.sighandler)
 
     def sighandler(self, signum, frame):
@@ -60,24 +60,30 @@ class ChatServer:
         running = True
         while running:
             try:
-                readable, writeable, exceptional = select
-                select(inputs, self.outputs, [])
+                readable, writeable, exceptional = select.select(inputs, self.outputs, [])
+                
             except select.error as e:
                 break
 
             for sock in readable:
                 if sock == self.server:
+                    # handle the server socket
                     client, address = self.server.accept()
-                    print(f"Chat server: got connection {client.fileno} from {address}")
-                    cname = receive(client).split("NAME: ")[1]
+                    print ("Chat server: got connection %d from %s" % (client.fileno(), address))
+                    # Read the login name
+                    cname = receive(client).split('NAME: ')[1]
+                    
+                    # Compute client name and send back
                     self.clients += 1
-                    send(client, "Client: " + str(address[0]))
+                    send(client, 'CLIENT: ' + str(address[0]))
                     inputs.append(client)
                     self.clientmap[client] = (address, cname)
-                    msg = f"\n(Connected: New client ({self.clients} from {self.get_client_name(client)}))"
+                    # Send joining information to other clients
+                    msg = "\n(Connected: New client (%d) from %s)" % (self.clients, self.get_client_name(client))
                     for output in self.outputs:
                         send(output, msg)
                     self.outputs.append(client)
+
                 elif sock == sys.stdin:
                     junk = sys.stdin.readline()
                     running = False
@@ -121,10 +127,12 @@ class ChatClient:
             self.connected = True
             send(self.sock, "NAME: " + self.name)
             data = receive(self.sock)
-            addr = data.split("CLIENT: ")[1]
+            # addr = data.split("CLIENT: ")[1]
+            addr = data.split('CLIENT: ')[1]
             self.prompt = "[" + "@".join((self.name, addr)) + "]> "
         except socket.error as e:
             print(f"Failed to connect to chat server@port {self.port}")
+            sys.exit(1)
 
     def run(self):
         while self.connected:
@@ -141,18 +149,17 @@ class ChatClient:
                             data = receive(self.sock)
                             if not data:
                                 print("Client shutting down")
-                            elif sock == self.sock:
-                                data = receive(self.sock)
-                                if not data:
-                                    print("Client shutting down")
-                                    self.connected = False
-                                    break
-                                else:
-                                    sys.stdout.write(data + "\n")
-                                    sys.stdout.flush()
+                                self.connected = False 
+                                break
+                            else:
+                                sys.stdout.write(data + "\n")
+                                sys.stdout.flush()
+
             except KeyboardInterrupt:
                 print(" Client interrupted")
                 self.sock.close()
+
+                
 
 
 if __name__ == "__main__":
