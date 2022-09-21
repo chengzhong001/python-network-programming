@@ -67,19 +67,14 @@ class ChatServer:
 
             for sock in readable:
                 if sock == self.server:
-                    # handle the server socket
                     client, address = self.server.accept()
-                    print ("Chat server: got connection %d from %s" % (client.fileno(), address))
-                    # Read the login name
-                    cname = receive(client).split('NAME: ')[1]
-                    
-                    # Compute client name and send back
+                    print(f"Chat server: got connection {client.fileno} from {address}")
+                    cname = receive(client).split("NAME: ")[1]
                     self.clients += 1
-                    send(client, 'CLIENT: ' + str(address[0]))
+                    send(client, "CLIENT: " + str(address[0]))
                     inputs.append(client)
                     self.clientmap[client] = (address, cname)
-                    # Send joining information to other clients
-                    msg = "\n(Connected: New client (%d) from %s)" % (self.clients, self.get_client_name(client))
+                    msg = f"\n(Connected: New client ({self.clients} from {self.get_client_name(client)}))"
                     for output in self.outputs:
                         send(output, msg)
                     self.outputs.append(client)
@@ -145,15 +140,15 @@ class ChatClient:
                         data = sys.stdin.readline().strip()
                         if data:
                             send(self.sock, data)
-                        elif sock == self.sock:
-                            data = receive(self.sock)
-                            if not data:
-                                print("Client shutting down")
-                                self.connected = False 
-                                break
-                            else:
-                                sys.stdout.write(data + "\n")
-                                sys.stdout.flush()
+                    elif sock == self.sock:
+                        data = receive(self.sock)
+                        if not data:
+                            print("Client shutting down")
+                            self.connected = False 
+                            break
+                        else:
+                            sys.stdout.write(data + "\n")
+                            sys.stdout.flush()
 
             except KeyboardInterrupt:
                 print(" Client interrupted")
