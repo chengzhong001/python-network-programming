@@ -44,7 +44,7 @@ class ChatServer:
         signal.signal(signal.SIGINT, self.sighandler)
 
     def sighandler(self, signum, frame):
-        print("shutting down server...")
+        print(" shutting down server...")
         for output in self.outputs:
             output.close()
         self.server.close()
@@ -68,7 +68,7 @@ class ChatServer:
             for sock in readable:
                 if sock == self.server:
                     client, address = self.server.accept()
-                    print(f"Chat server: got connection {client.fileno} from {address}")
+                    print(f"Chat server: got connection {client.fileno()} from {address}")
                     cname = receive(client).split("NAME: ")[1]
                     self.clients += 1
                     send(client, "CLIENT: " + str(address[0]))
@@ -91,17 +91,17 @@ class ChatServer:
                                 if output != sock:
                                     send(output, msg)
                         else:
-                            print(f"Chat server: {sock.fileno} hung up")
+                            print(f"Chat server: {sock.fileno()} hung up")
                             self.clients -= 1
                             sock.close()
-                            input.remove(sock)
+                            inputs.remove(sock)
                             self.outputs.remove(sock)
 
                             msg = f"\n(Now hung up: Client from {self.get_client_name(sock)})"
                             for output in self.outputs:
                                 send(output, msg)
                     except socket.error as e:
-                        input.remove(sock)
+                        inputs.remove(sock)
                         self.outputs.remove(sock)
 
         self.server.close()
@@ -153,6 +153,7 @@ class ChatClient:
             except KeyboardInterrupt:
                 print(" Client interrupted")
                 self.sock.close()
+                break
 
                 
 
