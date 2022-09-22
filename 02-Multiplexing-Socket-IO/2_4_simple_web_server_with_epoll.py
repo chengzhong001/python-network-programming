@@ -2,7 +2,7 @@ import argparse
 import select
 import socket
 
-SERVER_HOST = "localhost"
+SERVER_HOST = "0.0.0.0"
 EOL1 = b"\n\n"
 EOL2 = b"\n\r\n"
 SERVER_RESPONSE = b"""HTTP/1.1 200 OK\r\nDate: Mon, 1 Apr 2013 01:01:01 GMT\r\nContent-Type: text/plain\r\nContent-Length: 25\r\n\r\n
