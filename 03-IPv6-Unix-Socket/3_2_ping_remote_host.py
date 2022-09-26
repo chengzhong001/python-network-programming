@@ -31,7 +31,7 @@ class Pinger:
             sum &= 0xFFFFFFFF
 
         sum = (sum >> 16) + (sum & 0xFFFF)
-        sum +=  (sum >> 16)
+        sum += sum >> 16
         answer = ~sum
         answer &= 0xFFFF
         answer = answer >> 8 | (answer << 8 & 0xFF00)
